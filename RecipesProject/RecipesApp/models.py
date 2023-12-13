@@ -1,6 +1,9 @@
 from django.db import models
 
 # Create your models here.
+class Author(models.Model):
+    name=models.CharField(max_length=255)
+    age=models.IntegerField()
     
 class Recipe(models.Model):
     recipe_name= models.CharField(max_length=300)
@@ -13,7 +16,7 @@ class Recipe(models.Model):
     ingredients= models.TextField()
     instructions = models.TextField()
     tips= models.TextField()
-    image = models.ImageField(upload_to='static/recipe_images/', null=True, blank=True)
+    # image = models.ImageField(upload_to='static/recipe_images/', null=True, blank=True)
 
     def set_ingredients(self, ingredients_list):
         self.ingredients = '\n'.join(ingredients_list)
