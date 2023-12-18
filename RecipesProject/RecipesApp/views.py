@@ -25,7 +25,8 @@ class Recipes(viewsets.ViewSet):
             servings=request.data.get('servings'),
             ingredients=request.data.get('ingredients'),
             instructions=request.data.get('instructions'),
-            tips=request.data.get('tips'))
+            tips=request.data.get('tips'),
+            tags=request.data.get('tags'))
         r.save()
         return Response({"message":"created new recipe"},status.HTTP_201_CREATED)
     def destroy(self, request, pk=None):

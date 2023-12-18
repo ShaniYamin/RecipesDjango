@@ -16,6 +16,7 @@ class Recipe(models.Model):
     ingredients= models.TextField()
     instructions = models.TextField()
     tips= models.TextField()
+    tags= models.TextField(default=None)
     # image = models.ImageField(upload_to='static/recipe_images/', null=True, blank=True)
 
     def set_ingredients(self, ingredients_list):
@@ -35,6 +36,12 @@ class Recipe(models.Model):
 
     def get_tips(self):
         return self.tips.split('\n')
+    
+    def set_tags(self, tags_list):
+        self.tags = ','.join(tags_list)
+
+    def get_tags(self):
+        return self.tags.split(',')
     
     def __str__(self):
       return self.recipe_name + ' by ' + self.author_name
