@@ -82,7 +82,7 @@ WSGI_APPLICATION = 'RecipesProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mydatabase',
+        'NAME': 'shanisrecipes',
         'USER': 'root',
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': 'localhost',  # or the hostname where your MySQL server is running

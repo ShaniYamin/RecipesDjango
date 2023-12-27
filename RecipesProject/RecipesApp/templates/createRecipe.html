@@ -1,6 +1,17 @@
 <title>Create a Recipe</title>
 <form action="" method="POST" style="background-color:azure;">
 {% csrf_token %}
-{{form.as_p}}
+<table>
+   <h1>Create New Recipe</h1>
+{{form.as_table}}
+
+
+{{inForm.as_table}}
+
+{{ inForm.quantity_formset.management_form }}
+{% for form in inForm.quantity_formset.forms %}
+  {{ inForm.as_table }}
+{% endfor %}
+</table>
 <input type="submit" value="Submit">
 </form>

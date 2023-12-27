@@ -18,7 +18,7 @@ class Recipes(viewsets.ViewSet):
     def create(self,request):
         r= Recipe(recipe_name=request.data.get('recipeName'),
             author_name=request.data.get('authorName'),
-            category=request.data.get('category'),
+            categorys=request.data.get('category'),
             prep_time=request.data.get('prepTime'),
             cook_time=request.data.get('cookTime'),
             total_time=request.data.get('totalTime'),
@@ -39,9 +39,15 @@ def createRecipe(request):
     form= CreateRecipeForm()
     if request.method == 'POST':
         form= CreateRecipeForm(request.POST)
+        inForm= form.quantity_formset
         if form.is_valid():
             form.save();
-    context={"form":form}
+    elif request.method == 'GET':
+        form=CreateRecipeForm()
+        inForm= form.quantity_formset
+        context={"form":form,"inForm":inForm}
+        return render(request,'createRecipe.html',context)
+    context={"form":form,"inForm":inForm}
     return render(request,'createRecipe.html',context)
 
 class RecipeSerializer(serializers.ModelSerializer):
