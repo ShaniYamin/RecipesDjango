@@ -13,24 +13,28 @@ class Author(models.Model):
     
 class Ingredient(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100)
+    value = models.CharField(max_length=100)
+    label = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return self.label
     
-class Category(models.Model):
+
+class Unit(models.Model):
     id = models.AutoField(primary_key=True)
-    category= models.CharField(max_length=200,default=None)
+    value = models.CharField(max_length=100)
+    label = models.CharField(max_length=100)
     
     def __str__(self):
-        return self.category
+        return self.label 
     
-class Tags(models.Model):
+class Tag(models.Model):
     id = models.AutoField(primary_key=True)
-    tag=models.CharField(max_length=100)
+    value = models.CharField(max_length=100)
+    label = models.CharField(max_length=100)
     
     def __str__(self):
-        return self.tag
+        return self.label
     
 class Quantity(models.Model):
     id = models.AutoField(primary_key=True)
@@ -40,17 +44,18 @@ class Quantity(models.Model):
     
 class Recipe(models.Model):
     id = models.AutoField(primary_key=True)
-    recipe_name= models.CharField(max_length=300)
-    author_name= models.ForeignKey(Author, on_delete=models.CASCADE)
-    categorys= models.ManyToManyField(Category)
-    prep_time= models.IntegerField()
-    cook_time= models.IntegerField()
-    total_time= models.IntegerField()
-    servings= models.IntegerField()
-    ingredients= models.ManyToManyField(Ingredient, through='Quantity')
+    recipe_name = models.CharField(max_length=300)
+    author_name = models.ForeignKey(Author,related_name='RecipeAuthorName' ,on_delete=models.CASCADE)
+    author_email = models.ForeignKey(Author,related_name='RecipeAuthorEmail', on_delete=models.CASCADE)
+    prep_time = models.IntegerField()
+    cook_time = models.IntegerField()
+    total_time = models.IntegerField()
+    servings = models.IntegerField()
+    difficulty = models.CharField(max_length=300,default=None)
+    ingredients = models.ManyToManyField(Ingredient, through='Quantity')
     instructions = models.JSONField(default=list)
     tips = models.JSONField(default=list)
-    tags= models.ManyToManyField(Tags)
+    tags = models.ManyToManyField(Tag)
     # image = models.ImageField(upload_to='static/recipe_images/', null=True, blank=True)
 
     def set_instructions(self, instructions_list):
@@ -65,11 +70,6 @@ class Recipe(models.Model):
     def get_tips(self):
         return self.tips
     
-    @classmethod
-    def get_or_create_category(cls, category_name):
-        category, created = Category.objects.get_or_create(category=category_name)
-        return category
-
     @classmethod
     def get_or_create_tag(cls, tag_name):
         tag, created = Tags.objects.get_or_create(tag=tag_name)

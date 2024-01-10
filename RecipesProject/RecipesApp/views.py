@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Recipe
+from .models import Recipe,Tag,Ingredient,Unit
 from rest_framework import serializers,viewsets,status
 
 from .forms import CreateRecipeForm
@@ -34,6 +34,24 @@ class Recipes(viewsets.ViewSet):
         recipes = Recipe.objects.all()
         serializer = RecipeSerializer(recipes, many=True)
         return Response({"recipes": serializer.data}, status.HTTP_200_OK)
+
+class Tags(viewsets.ViewSet):
+     def list(self,request):
+        tags = Tag.objects.all()
+        serializer = tagsSerializer(tags, many=True)
+        return Response({"tags": serializer.data}, status=status.HTTP_200_OK)
+    
+class Ingredients(viewsets.ViewSet):
+     def list(self,request):
+        ingredients = Ingredient.objects.all()
+        serializer = ingredientsSerializer(ingredients, many=True)
+        return Response({"ingredients": serializer.data}, status=status.HTTP_200_OK)
+
+class Units(viewsets.ViewSet):
+     def list(self,request):
+        units = Unit.objects.all()
+        serializer = unitSerializer(units, many=True)
+        return Response({"units": serializer.data}, status=status.HTTP_200_OK)
         
 def createRecipe(request):
     form= CreateRecipeForm()
@@ -54,4 +72,20 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = '__all__'
+        
+class tagsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = '__all__'
+        
+class ingredientsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ingredient
+        fields = '__all__'
+        
+class unitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Unit
+        fields = '__all__'
+                
 

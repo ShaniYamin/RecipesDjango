@@ -22,10 +22,8 @@ class CreateRecipeForm(forms.ModelForm):
         model = Recipe
         fields = "__all__"
         widgets = {
-            # 'categorys':forms.Textarea(attrs={'rows': 2}),
             'instructions': forms.Textarea(attrs={'rows': 4}),
             'tips': forms.Textarea(attrs={'rows': 4}),
-            # 'tags': forms.Textarea(attrs={'rows': 2}),
         }
     QuantityFormSet = inlineformset_factory(Recipe, Quantity, form=QuantityForm, extra=1, can_delete=False)
     
