@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Recipe,Tag,Ingredient,Unit
+from .models import Recipe,Tag,Ingredient,Unit,Author,Quantity
 from rest_framework import serializers,viewsets,status
 
 from .forms import CreateRecipeForm
@@ -16,18 +16,30 @@ class Recipes(viewsets.ViewSet):
         serializer = RecipeSerializer(recipes, many=True)
         return Response({"recipes": serializer.data}, status=status.HTTP_200_OK)
     def create(self,request):
-        r= Recipe(recipe_name=request.data.get('recipeName'),
-            author_name=request.data.get('authorName'),
-            categorys=request.data.get('category'),
+        print(request.data)
+        author,created_author =Author.objects.get_or_create(name=request.data.get('authorName'),email=request.data.get('authorEmail'))
+        recipe = Recipe(recipe_name=request.data.get('recipeName'),
+            author_name=author,
+            author_email=author,
             prep_time=request.data.get('prepTime'),
             cook_time=request.data.get('cookTime'),
             total_time=request.data.get('totalTime'),
             servings=request.data.get('servings'),
-            ingredients=request.data.get('ingredients'),
+            difficulty=request.data.get('difficulty'),
             instructions=request.data.get('instructions'),
-            tips=request.data.get('tips'),
-            tags=request.data.get('tags'))
-        r.save()
+            tips=request.data.get('tips'))
+        recipe.save()
+        ingredients = request.data.get('ingredients')
+        for ingred in ingredients:
+            unit_obj, created_unit = Unit.objects.get_or_create(value=ingred['unit'], label=ingred['unit'])
+            ingredient_obj, created_ingredient = Ingredient.objects.get_or_create(value=ingred['ingredient'], label=ingred['ingredient'])
+            quan=Quantity(unit=unit_obj,ingredient=ingredient_obj,quantity=ingred['quantity'])
+            recipe.ingredients.add(quan)
+        tags = request.data.get('tags')
+        for tag in tags:
+            tag_obj, created_tag = Tag.objects.get_or_create(value=tag.value,label=tag.label)
+            recipe.Tag.add(tag_obj)
+        recipe.save()
         return Response({"message":"created new recipe"},status.HTTP_201_CREATED)
     def destroy(self, request, pk=None):
         Recipe.objects.filter(id=pk).delete()
@@ -40,6 +52,12 @@ class Tags(viewsets.ViewSet):
         tags = Tag.objects.all()
         serializer = tagsSerializer(tags, many=True)
         return Response({"tags": serializer.data}, status=status.HTTP_200_OK)
+
+class Authors(viewsets.ViewSet):
+     def list(self,request):
+        authors = Author.objects.all()
+        serializer = authorsSerializer(authors, many=True)
+        return Response({"authors": serializer.data}, status=status.HTTP_200_OK)
     
 class Ingredients(viewsets.ViewSet):
      def list(self,request):
@@ -86,6 +104,11 @@ class ingredientsSerializer(serializers.ModelSerializer):
 class unitSerializer(serializers.ModelSerializer):
     class Meta:
         model = Unit
+        fields = '__all__'
+        
+class authorsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Author
         fields = '__all__'
                 
 

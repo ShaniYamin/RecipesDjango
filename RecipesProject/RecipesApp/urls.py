@@ -8,6 +8,7 @@ urlpatterns = [
     path('createRecipe/',views.createRecipe,name='createRecipe'),
     path('tags/',views.Tags.as_view({'get': 'list'})),
     path('ingredients/',views.Ingredients.as_view({'get': 'list'})),
-     path('units/',views.Units.as_view({'get': 'list'})),
+    path('units/',views.Units.as_view({'get': 'list'})),
+    path('authors/',views.Authors.as_view({'get': 'list'})),    
 ]
 
