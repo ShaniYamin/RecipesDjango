@@ -1,10 +1,10 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Recipe,Tag,Ingredient,Unit,Author,Quantity
+from .models import Recipe,Tag,Ingredient,Unit,Author,RecipeIngredientsLine
 from rest_framework import serializers,viewsets,status
 
-from .forms import CreateRecipeForm
+# from .forms import CreateRecipeForm
 
 @api_view(['GET'])
 def home(request):
@@ -17,10 +17,9 @@ class Recipes(viewsets.ViewSet):
         return Response({"recipes": serializer.data}, status=status.HTTP_200_OK)
     def create(self,request):
         print(request.data)
-        author,created_author =Author.objects.get_or_create(name=request.data.get('authorName'),email=request.data.get('authorEmail'))
+        author_obj,created_author =Author.objects.get_or_create(name=request.data.get('authorName'),email=request.data.get('authorEmail'),bio="new")
         recipe = Recipe(recipe_name=request.data.get('recipeName'),
-            author_name=author,
-            author_email=author,
+            author=author_obj,
             prep_time=request.data.get('prepTime'),
             cook_time=request.data.get('cookTime'),
             total_time=request.data.get('totalTime'),
@@ -30,15 +29,20 @@ class Recipes(viewsets.ViewSet):
             tips=request.data.get('tips'))
         recipe.save()
         ingredients = request.data.get('ingredients')
+        print("aaaaaaaaaaaaaaa")
+        print(ingredients)
+        print("bbbbbbbbbbbbbbb")
         for ingred in ingredients:
+            print('print',ingred)
             unit_obj, created_unit = Unit.objects.get_or_create(value=ingred['unit'], label=ingred['unit'])
             ingredient_obj, created_ingredient = Ingredient.objects.get_or_create(value=ingred['ingredient'], label=ingred['ingredient'])
-            quan=Quantity(unit=unit_obj,ingredient=ingredient_obj,quantity=ingred['quantity'])
-            recipe.ingredients.add(quan)
+            quan=RecipeIngredientsLine(recipe=recipe,unit=unit_obj,ingredient=ingredient_obj,quantity=ingred['quantity'])
+            quan.save()
+            recipe.ingredients.add(ingredient_obj)
         tags = request.data.get('tags')
-        for tag in tags:
-            tag_obj, created_tag = Tag.objects.get_or_create(value=tag.value,label=tag.label)
-            recipe.Tag.add(tag_obj)
+        for RecipeTag in tags:
+            tag_obj, created_tag = Tag.objects.get_or_create(value=RecipeTag["value"],label=RecipeTag["label"])
+            recipe.tags_set(tag_obj)
         recipe.save()
         return Response({"message":"created new recipe"},status.HTTP_201_CREATED)
     def destroy(self, request, pk=None):
@@ -71,20 +75,20 @@ class Units(viewsets.ViewSet):
         serializer = unitSerializer(units, many=True)
         return Response({"units": serializer.data}, status=status.HTTP_200_OK)
         
-def createRecipe(request):
-    form= CreateRecipeForm()
-    if request.method == 'POST':
-        form= CreateRecipeForm(request.POST)
-        inForm= form.quantity_formset
-        if form.is_valid():
-            form.save();
-    elif request.method == 'GET':
-        form=CreateRecipeForm()
-        inForm= form.quantity_formset
-        context={"form":form,"inForm":inForm}
-        return render(request,'createRecipe.html',context)
-    context={"form":form,"inForm":inForm}
-    return render(request,'createRecipe.html',context)
+# def createRecipe(request):
+#     form= CreateRecipeForm()
+#     if request.method == 'POST':
+#         form= CreateRecipeForm(request.POST)
+#         inForm= form.quantity_formset
+#         if form.is_valid():
+#             form.save();
+#     elif request.method == 'GET':
+#         form=CreateRecipeForm()
+#         inForm= form.quantity_formset
+#         context={"form":form,"inForm":inForm}
+#         return render(request,'createRecipe.html',context)
+#     context={"form":form,"inForm":inForm}
+#     return render(request,'createRecipe.html',context)
 
 class RecipeSerializer(serializers.ModelSerializer):
     class Meta:

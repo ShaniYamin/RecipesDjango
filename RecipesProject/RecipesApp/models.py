@@ -35,27 +35,17 @@ class Tag(models.Model):
     def __str__(self):
         return self.label
     
-class Quantity(models.Model):
-    id = models.AutoField(primary_key=True)
-    recipe=models.ForeignKey('Recipe', on_delete=models.CASCADE)
-    unit = models.ForeignKey(Unit, on_delete=models.CASCADE )
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    quantity = models.FloatField()
-    
-    def __str__(self):
-        return f"{self.quantity} {self.unit.label} of {self.ingredient.label}"    
     
 class Recipe(models.Model):
     id = models.AutoField(primary_key=True)
     recipe_name = models.CharField(max_length=300)
-    author_name = models.ForeignKey(Author,related_name='RecipeAuthorName' ,on_delete=models.CASCADE)
-    author_email = models.ForeignKey(Author,related_name='RecipeAuthorEmail', on_delete=models.CASCADE)
+    author = models.ForeignKey(Author,on_delete=models.CASCADE,default=None,related_name='authorOfRecipe')
     prep_time = models.IntegerField()
     cook_time = models.IntegerField()
     total_time = models.IntegerField()
     servings = models.IntegerField()
     difficulty = models.CharField(max_length=300,default=None)
-    ingredients = models.ManyToManyField(Ingredient, through='Quantity')
+    ingredients = models.ManyToManyField(Ingredient, related_name='IngredientsForRecipe', through='RecipeIngredientsLine')
     instructions = models.JSONField(default=list)
     tips = models.JSONField(default=list)
     tags = models.ManyToManyField(Tag)
@@ -71,4 +61,15 @@ class Recipe(models.Model):
 
     
     def __str__(self):
-      return f"{self.recipe_name} by {self.author_name}"
+      return f"{self.recipe_name} by {self.author.name}"
+
+class RecipeIngredientsLine(models.Model):
+    id = models.AutoField(primary_key=True)
+    recipe=models.ForeignKey(Recipe,  on_delete=models.CASCADE)
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE )
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+    quantity = models.FloatField()
+    
+    def __str__(self):
+        return f"{self.quantity} {self.unit.label} of {self.ingredient.label}"  
+    

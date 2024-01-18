@@ -5,6 +5,6 @@ from .models import *
 admin.site.register(Author)
 admin.site.register(Ingredient)
 admin.site.register(Unit)
-admin.site.register(Quantity)
+admin.site.register(RecipeIngredientsLine)
 admin.site.register(Tag)
 admin.site.register(Recipe)
